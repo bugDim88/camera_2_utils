@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name" translatable="false">library</string>
+    <string name="request_permission">This application needs camera permission.</string>
+    <string name="error_message">Error.</string>
+</resources>

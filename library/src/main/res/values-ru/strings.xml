@@ -1,0 +1,4 @@
+<resources>
+    <string name="request_permission">Для работы камеры необходимо это разрешение.</string>
+    <string name="error_message">Ошибка.</string>
+</resources>
