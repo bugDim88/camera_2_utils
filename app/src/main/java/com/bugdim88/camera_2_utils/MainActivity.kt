@@ -4,7 +4,7 @@ import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import com.pirsmapp.borlas.pirs.view.camera.Camera2Fragment
+import com.bugdim88.library.Camera2Fragment
 
 class MainActivity : AppCompatActivity() {
 

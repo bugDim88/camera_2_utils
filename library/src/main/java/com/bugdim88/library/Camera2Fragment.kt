@@ -1,4 +1,4 @@
-package com.pirsmapp.borlas.pirs.view.camera
+package com.bugdim88.library
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -17,7 +17,6 @@ import android.util.SparseIntArray
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.bugdim88.library.*
 import timber.log.Timber
 import java.lang.Long.signum
 import java.util.*
