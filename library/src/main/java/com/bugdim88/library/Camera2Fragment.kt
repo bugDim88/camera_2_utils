@@ -79,6 +79,11 @@ abstract class Camera2Fragment : Fragment() {
     private var backgroundHandler: Handler? = null
 
     /**
+     * A Main Thread [Handler]
+     */
+    private var handler: Handler? = null
+
+    /**
      * An [ImageReader] that handles still image capture.
      */
     private var imageReader: ImageReader? = null
@@ -142,9 +147,9 @@ abstract class Camera2Fragment : Fragment() {
      */
 
     private val onImageAvailableListener = ImageReader.OnImageAvailableListener {
-        backgroundHandler?.post(Runnable {
-            saveCapturedImage(it.acquireNextImage())
-        })
+        backgroundHandler?.post {
+            handler?.post {saveCapturedImage(it.acquireNextImage())}
+        }
     }
 
     /**
@@ -278,12 +283,14 @@ abstract class Camera2Fragment : Fragment() {
     override fun onResume() {
         super.onResume()
         startBackgroundThread()
+        handler = Handler()
         reopenTheCamera()
     }
 
     override fun onPause() {
         closeCamera()
         stopBackgroundThread()
+        handler = null
         super.onPause()
     }
 
