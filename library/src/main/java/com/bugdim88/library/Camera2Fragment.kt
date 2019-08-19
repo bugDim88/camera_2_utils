@@ -148,7 +148,8 @@ abstract class Camera2Fragment : Fragment() {
 
     private val onImageAvailableListener = ImageReader.OnImageAvailableListener {
         backgroundHandler?.post {
-            handler?.post {saveCapturedImage(it.acquireNextImage())}
+            val image = it.acquireLatestImage() ?: return@post
+            handler?.post {saveCapturedImage(image)}
         }
     }
 
