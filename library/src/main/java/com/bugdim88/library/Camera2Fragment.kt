@@ -18,6 +18,7 @@ import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import timber.log.Timber
+import java.lang.IllegalArgumentException
 import java.lang.Long.signum
 import java.util.*
 import java.util.concurrent.Semaphore
@@ -37,6 +38,7 @@ abstract class Camera2Fragment : Fragment() {
      */
     private val MAX_PREVIEW_HEIGHT = 1080
 
+    private val JPEG_QUALITY = 80
 
     /**
      * Camera state: Showing camera preview.
@@ -149,7 +151,7 @@ abstract class Camera2Fragment : Fragment() {
     private val onImageAvailableListener = ImageReader.OnImageAvailableListener {
         backgroundHandler?.post {
             val image = it.acquireLatestImage() ?: return@post
-            handler?.post {saveCapturedImage(image)}
+            handler?.post { saveCapturedImage(image) }
         }
     }
 
@@ -271,7 +273,22 @@ abstract class Camera2Fragment : Fragment() {
      */
     private var sensorOrientation = 0
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    /**
+     * Compression quality of the final JPEG image.
+     * Range of valid values:
+    1-100; larger is higher quality
+     */
+    var outputJPEGQuality = JPEG_QUALITY
+        set(value) {
+            if (value !in 1..100) throw(IllegalArgumentException("$value not in 1..100 range"))
+            field = value
+        }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val v = inflater.inflate(R.layout.fragment_camera_2, container, false)
         textureView = v.findViewById(R.id.autoFitTextureView)
         captureButton = v.findViewById(R.id.button_capture)
@@ -473,12 +490,16 @@ abstract class Camera2Fragment : Fragment() {
                     target?.width ?: 800,
                     target?.height ?: 600, ImageFormat.JPEG, 2
                 )
-                imageReader?.setOnImageAvailableListener(onImageAvailableListener, backgroundHandler)
+                imageReader?.setOnImageAvailableListener(
+                    onImageAvailableListener,
+                    backgroundHandler
+                )
 
                 // Find out if we need to swap dimension to get the preview size relative to sensor
                 // coordinate.
                 val displayRotation = activity?.windowManager?.defaultDisplay?.rotation ?: continue
-                sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)?:continue
+                sensorOrientation =
+                    characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION) ?: continue
                 val swappedDimensions = areDimensionsSwapped(displayRotation)
 
                 val displaySize = Point()
@@ -544,7 +565,8 @@ abstract class Camera2Fragment : Fragment() {
             previewRequestBuilder.addTarget(surface)
 
             // Here, we create a CameraCaptureSession for camera preview.
-            cameraDevice?.createCaptureSession(listOf(surface, imageReader?.surface),
+            cameraDevice?.createCaptureSession(
+                listOf(surface, imageReader?.surface),
                 object : CameraCaptureSession.StateCallback() {
                     override fun onConfigured(cameraCaptureSession: CameraCaptureSession) {
                         // The camera is already closed
@@ -710,6 +732,12 @@ abstract class Camera2Fragment : Fragment() {
                 set(
                     CaptureRequest.CONTROL_AF_MODE,
                     CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
+                )
+
+                // Set quality
+                set(
+                    CaptureRequest.JPEG_QUALITY,
+                    outputJPEGQuality.toByte()
                 )
             }?.also { setAutoFlash(it) }
 
