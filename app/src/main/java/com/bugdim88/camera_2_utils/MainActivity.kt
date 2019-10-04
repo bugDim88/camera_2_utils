@@ -85,9 +85,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun exceptionCallback(e: Exception) {
-            activity?.supportFragmentManager?.beginTransaction()
-                ?.replace(R.id.fragment_container, CameraFragment(), null)?.commit()
             Toast.makeText(activity, "Error", Toast.LENGTH_SHORT).show()
+            view?.postDelayed({
+                activity?.supportFragmentManager?.beginTransaction()
+                    ?.replace(R.id.fragment_container, CameraFragment(), null)?.commit()
+            }, 1000)
         }
 
     }
