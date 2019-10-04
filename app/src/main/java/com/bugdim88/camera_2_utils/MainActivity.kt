@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.lang.Exception
 import kotlin.math.ln
 import kotlin.math.pow
 
@@ -82,6 +83,13 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             }
         }
+
+        override fun exceptionCallback(e: Exception) {
+            activity?.supportFragmentManager?.beginTransaction()
+                ?.replace(R.id.fragment_container, CameraFragment(), null)?.commit()
+            Toast.makeText(activity, "Error", Toast.LENGTH_SHORT).show()
+        }
+
     }
 }
 

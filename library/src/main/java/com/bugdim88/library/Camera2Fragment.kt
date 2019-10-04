@@ -18,7 +18,9 @@ import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import timber.log.Timber
+import java.lang.Exception
 import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 import java.lang.Long.signum
 import java.util.*
 import java.util.concurrent.Semaphore
@@ -284,6 +286,8 @@ abstract class Camera2Fragment : Fragment() {
             field = value
         }
 
+    open fun exceptionCallback(e: Exception){}
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -342,6 +346,8 @@ abstract class Camera2Fragment : Fragment() {
     open fun onPhotoButtonClick() {
         lockFocus()
     }
+
+    private fun onIllegalStateException(e: IllegalStateException) = exceptionCallback(e)
 
     /**
      *  When the screen is turned off and turned back on, the SurfaceTexture is already
@@ -602,6 +608,9 @@ abstract class Camera2Fragment : Fragment() {
             )
         } catch (e: CameraAccessException) {
             Timber.e(e.toString())
+        } catch (e: java.lang.IllegalStateException){
+            Timber.e(e.toString())
+            onIllegalStateException(e)
         }
 
     }
@@ -660,6 +669,8 @@ abstract class Camera2Fragment : Fragment() {
             )
         } catch (e: CameraAccessException) {
             Timber.e(e.toString())
+        } catch (e: IllegalStateException){
+            onIllegalStateException(e)
         }
     }
 
@@ -762,6 +773,9 @@ abstract class Camera2Fragment : Fragment() {
             }
         } catch (e: CameraAccessException) {
             Timber.e(e.toString())
+        }catch(e: java.lang.IllegalStateException){
+            Timber.e(e.toString())
+            onIllegalStateException(e)
         }
     }
 
