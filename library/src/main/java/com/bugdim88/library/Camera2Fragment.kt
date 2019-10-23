@@ -598,6 +598,10 @@ abstract class Camera2Fragment : Fragment() {
                         } catch (e: CameraAccessException) {
                             Timber.e(e.toString())
                         }
+                        catch (e: java.lang.IllegalStateException){
+                            Timber.e(e.toString())
+                            onIllegalStateException(e)
+                        }
 
                     }
 
